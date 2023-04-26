@@ -282,4 +282,7 @@ BUILD/NUCLEO_F411RE/ARMC6/main.o: main.cpp \
   mbed-os/platform/include/platform/ScopedRamExecutionLock.h \
   mbed-os/platform/include/platform/mbed_stats.h \
   mbed-os/platform/include/platform/Stream.h \
-  mbed-os/platform/include/platform/FileLike.h VL53L0X/VL53L0X.h
+  mbed-os/platform/include/platform/FileLike.h HCSR04/HCSR04.h \
+  VL53L0X/VL53L0X.h VL53L0X/platform/inc/vl53l0x_platform.h \
+  VL53L0X/core/inc/vl53l0x_def.h VL53L0X/core/inc/vl53l0x_device.h \
+  VL53L0X/platform/inc/vl53l0x_types.h
