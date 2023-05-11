@@ -6,6 +6,79 @@
  * @copyright Copyright (c) 2023, all rights reserved
  * 
  */
+#include "PinNames.h"
+#include "mbed.h"
+#include "HCSR04.h"
+#include "VL53L0X.h"
+#include <cstdio>
+using namespace std;
+
+#define CM 0 
+
+//NUCLEO F411RE
+
+//=========================== PIN CONNECTIONS ========================================
+// LIDAR
+I2C i2c(D14,D15);   //i2c pins: D15 SCL and D14 SDA
+VL53L0X vl53l0x(&i2c);
+
+//ULTRASONIC
+HCSR04 hcsr04(D3, D2); // Set HC-SR04 trigger and echo pins
+
+//MOTOR
+PwmOut motor_pwm(D9);
+
+int main() {
+
+    // Set the initial motor speed
+    float speed = 0;
+
+    // Set the motor PWM frequency and initial duty cycle
+    motor_pwm.period(0.01);
+    motor_pwm.write(0.1);
+
+    //========================== READ SENSORS ============================
+    // Initiate Ultrasonic
+    //hcsr04.start();
+
+    // Initiate Lidar and start continuous reading
+    vl53l0x.init();
+    vl53l0x.setModeContinuous();
+    vl53l0x.startContinuous();
+
+
+    while (1) {
+        // Initiate Ultrasonic
+        hcsr04.start();
+        wait_us(500000); 
+        //record ultrasonic
+        int dist_hc = hcsr04.get_dist_cm(); // Measure distance with HC-SR04 in centimeters
+
+        printf("HC-SRO4 %ucm \n", dist_hc);
+
+        //record lidar
+        uint16_t dist_vl= vl53l0x.getRangeMillimeters()/ 10; // Measure distance with VL53L0X in centimeters
+
+        printf("VL53L0X %ucm \n", dist_vl);
+        //cout << "Distance HC-SR04: " << dist << " cm" << endl;
+
+        // Increase the motor speed gradually
+        speed += 0.025;
+        
+        // Reset the speed to the minimum value when it reaches the maximum
+        if (speed > 1.0) {
+        speed = 0.1;
+        }
+        
+        // Set the motor duty cycle to the current speed
+    motor_pwm.write(speed);
+
+    }
+
+}   
+ 
+
+
 
 #include "PinNames.h"
 #include "mbed.h"
@@ -71,7 +144,7 @@ int measure_distance_b() {
 
 int distance_a;
 int distance_b;
-
+int motor_speed;
 //============================= TIMER FUNCTION ==============================================
 // Interrupt function to measure distance and calculate average distance without using the wait() function
 void timer_interrupt() {
@@ -91,8 +164,9 @@ void timer_interrupt() {
 
     // Calculate average every 10 milliseconds
     if (timer.elapsed_time().count() >= 10) {
-        // Calculate average distance for sensor a
+        // Calculate average distance for ultrasonic
         a.average = a.total / 10;
+
         printf("HCSR04 %ucm \n", a.average);
         // If the distance readings have been constantly falling, vibrate the motor
         if (a.average < a.last_average) {
@@ -101,20 +175,21 @@ void timer_interrupt() {
             a.motor_speed = 0;
         }
 
-        // Store last average distance for sensor a
-        a.last_average = a.average;
-
         // Calculate average distance for sensor b
         b.average = b.total / 10;
         printf("VL53L0X %ucm \n", b.average);
+        
         // If the distance readings have been constantly falling, vibrate the motor
-        if (b.average < b.last_average) {
-            b.motor_speed = 100 * (b.last_average - b.average);
+        if ((b.average < b.last_average) && (a.average < a.last_average)){
+            motor_speed = 100 * ((b.last_average - b.average) + (a.last_average - a.average));
         } else {
             b.motor_speed = 0;
         }
 
-        // Store last average distance for sensor b
+        // Store last average for ultrasonic
+        a.last_average = a.average;
+
+        // Store last average for lidar
         b.last_average = b.average;
         
         // Reset timer
@@ -150,7 +225,7 @@ int main() {
     }
 }
 
-
+*/
 
 
 
