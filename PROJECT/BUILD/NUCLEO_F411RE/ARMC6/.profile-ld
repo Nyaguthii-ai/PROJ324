@@ -3,6 +3,7 @@
         "--any_contingency",
         "--cpu=Cortex-M4",
         "--ide=mbed",
+        "--inline",
         "--keep=os_cb_sections",
         "--legacyalign",
         "--predefine=\"-DMBED_BOOT_STACK_SIZE=1024\"",
@@ -11,9 +12,7 @@
         "--predefine=\"-DMBED_ROM_SIZE=0x80000\"",
         "--predefine=\"-DMBED_ROM_START=0x8000000\"",
         "--predefine=\"-DXIP_ENABLE=0\"",
-        "--remove",
-        "--show_full_path",
-        "--verbose"
+        "--show_full_path"
     ],
     "macros": [],
     "symbols": [
@@ -43,7 +42,7 @@
         "DEVICE_STDIO_MESSAGES=1",
         "DEVICE_USTICKER=1",
         "DEVICE_WATCHDOG=1",
-        "MBED_BUILD_TIMESTAMP=1682504459.3556402",
+        "MBED_BUILD_TIMESTAMP=1683791910.210897",
         "STM32F411xE",
         "TARGET_CORTEX",
         "TARGET_CORTEX_M",

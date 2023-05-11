@@ -16,6 +16,9 @@ using namespace std;
 I2C i2c(D14,D15);
 VL53L0X sensor(&i2c);
 
+//MOTOR
+PwmOut motor_pwm(D9);
+
 uint16_t measure = 0;
 int zero = 0;
 int total = 0;
@@ -32,6 +35,11 @@ int main()
     sensor.init();
     sensor.setModeContinuous();
     sensor.startContinuous();
+
+
+    // Set the motor PWM frequency and initial duty cycle
+    motor_pwm.period(0.01);
+    motor_pwm.write(0.1);
 
  while(1)
    {
@@ -50,6 +58,14 @@ VL53L0X lidar(PA_6,PA_5); // Set VL53L0X I2C pins sda, scl
 DigitalOut led(LED1);
 
 int main() {
+
+    // Set the initial motor speed
+    float speed = 0;
+
+    // Set the motor PWM frequency and initial duty cycle
+    motor_pwm.period(0.01);
+    motor_pwm.write(0.1);
+
     while (1) {
 
         hcsr04.start();
@@ -64,12 +80,16 @@ int main() {
 
         //printf("Distance VL53L0X %u \n",distance_vl53l0x);
  
-
-        if (dist < 20.0 || distance_vl53l0x < 20) { // If there is an obstacle within 20cm
-            led = 1; // Turn on LED
-        } else {
-            led = 0; // Turn off LED
-        }
+// Increase the motor speed gradually
+    //speed += 0.1;
+        
+    // Reset the speed to the minimum value when it reaches the maximum
+    if (speed > 1.0) {
+        speed = 0.1;
+    }
+        
+    // Set the motor duty cycle to the current speed
+    motor_pwm.write(speed);
 
         wait_us(100000); // Wait for 100ms before taking another measurement
     }
